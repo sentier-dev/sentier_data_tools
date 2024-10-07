@@ -1,4 +1,3 @@
-from typing import List, Optional, Union
 from rdflib import URIRef, Literal, Graph
 
 from SPARQLWrapper import JSON, SPARQLWrapper
@@ -8,7 +7,7 @@ from sentier_data_tools.logs import stdout_feedback_logger as logger
 VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 
 
-def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
+def convert_json_object(obj: dict) -> URIRef | Literal:
     if obj['type'] == 'literal':
         return Literal(obj['value'], lang=obj.get("xml:lang"), datatype=obj.get('datatype'))
     elif obj['type'] == 'uri':
@@ -19,7 +18,7 @@ def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
 
 
 class VocabIRI(URIRef):
-    def triples(self, *, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
+    def triples(self, *, subject: bool = True, limit: int | None = 25) -> list[tuple]:
         """Return a list of triples with `rdflib` objects"""
         if subject:
             query = f"""
