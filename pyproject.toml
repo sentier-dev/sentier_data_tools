@@ -29,6 +29,11 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "openpyxl",
+    "pandas",
+    "peewee",
+    "platformdirs",
+    "pydantic",
     "rdflib",
     "SPARQLWrapper",
     "structlog",

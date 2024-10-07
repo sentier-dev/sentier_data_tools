@@ -10,7 +10,9 @@ def get_stdout_feedback_logger(name: str, level: int = logging.INFO):
     logger.propagate = False
     logger.setLevel(level)
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s", "%H:%M:%S%z")
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s", "%H:%M:%S%z"
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger

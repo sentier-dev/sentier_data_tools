@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
-from rdflib import URIRef, Literal, Graph
 
+from rdflib import Graph, Literal, URIRef
 from SPARQLWrapper import JSON, SPARQLWrapper
 
 from sentier_data_tools.logs import stdout_feedback_logger as logger
@@ -9,10 +9,12 @@ VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 
 
 def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
-    if obj['type'] == 'literal':
-        return Literal(obj['value'], lang=obj.get("xml:lang"), datatype=obj.get('datatype'))
+    if obj["type"] == "literal":
+        return Literal(
+            obj["value"], lang=obj.get("xml:lang"), datatype=obj.get("datatype")
+        )
     else:
-        return URIRef(obj['value'])
+        return URIRef(obj["value"])
 
 
 class VocabIRI(URIRef):
@@ -46,17 +48,23 @@ class VocabIRI(URIRef):
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
         if subject:
-            return [(
-                URIRef(str(self)),
-                convert_json_object(line['p']),
-                convert_json_object(line['o']),
-            ) for line in results]
+            return [
+                (
+                    URIRef(str(self)),
+                    convert_json_object(line["p"]),
+                    convert_json_object(line["o"]),
+                )
+                for line in results
+            ]
         else:
-            return [(
-                convert_json_object(line['s']),
-                convert_json_object(line['p']),
-                URIRef(str(self)),
-            ) for line in results]
+            return [
+                (
+                    convert_json_object(line["s"]),
+                    convert_json_object(line["p"]),
+                    URIRef(str(self)),
+                )
+                for line in results
+            ]
 
     def graph(self, subject: bool = True) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
