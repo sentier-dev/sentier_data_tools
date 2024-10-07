@@ -11,8 +11,11 @@ VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
     if obj['type'] == 'literal':
         return Literal(obj['value'], lang=obj.get("xml:lang"), datatype=obj.get('datatype'))
-    else:
+    elif obj['type'] == 'uri':
         return URIRef(obj['value'])
+    else:
+        error_msg = f"Unknown object type {obj['type']}"
+        raise ValueError(error_msg)
 
 
 class VocabIRI(URIRef):
