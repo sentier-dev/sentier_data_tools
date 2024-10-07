@@ -2,6 +2,7 @@ from rdflib import Graph, Literal, URIRef
 from SPARQLWrapper import JSON, SPARQLWrapper
 
 from sentier_data_tools.logs import stdout_feedback_logger as logger
+from sentier_data_tools.utils import TriplePosition
 
 VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 
@@ -20,28 +21,29 @@ def convert_json_object(obj: dict) -> URIRef | Literal:
 
 
 class VocabIRI(URIRef):
-    def triples(self, *, subject: bool = True, limit: int | None = 25) -> list[tuple]:
-        """Return a list of triples with `rdflib` objects"""
-        if subject:
-            query = f"""
-                SELECT ?s ?p ?o
-                FROM <{self.graph_url}>
-                WHERE {{
-                    VALUES ?s {{ <{str(self)}> }}
-                    ?s ?p ?o
-                }}
-            """
+    def triples(
+        self,
+        *,
+        triple_position: TriplePosition = TriplePosition.SUBJECT,
+        limit: int | None = 25,
+    ) -> list[tuple]:
+        """Get triples from the sentier.dev vocabulary for the given IRI.
 
-        else:
-            query = f"""
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT ?s ?p ?o
-                FROM <{self.graph_url}>
-                WHERE {{
-                    VALUES ?o {{ <{str(self)}> }}
-                    ?s ?p ?o
-                }}
-            """
+        Args:
+            triple_position (TriplePosition, optional): The position of the IRI in the triple. Can be SUBJECT, PREDICATE, or OBJECT. Defaults to TriplePosition.SUBJECT.
+            limit (int | None, optional): The maximum number of triples to return. Defaults to 25.
+
+        Returns:
+            list[tuple]: A list of triples from the sentier.dev vocabulary.
+        """
+        query = f"""
+            SELECT ?s ?p ?o
+            FROM <{self.graph_url}>
+            WHERE {{
+                VALUES ?{triple_position.value} {{ <{str(self)}> }}
+                ?s ?p ?o
+            }}
+        """
 
         if limit is not None:
             query += f"LIMIT {int(limit)}"
@@ -57,10 +59,10 @@ class VocabIRI(URIRef):
             for line in results
         ]
 
-    def graph(self, *, subject: bool = True) -> Graph:
+    def graph(self, *, triple_position: TriplePosition = TriplePosition.SUBJECT) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
         graph = Graph()
-        for triple in self.triples(subject=subject, limit=None):
+        for triple in self.triples(triple_position=triple_position, limit=None):
             graph.add(triple)
         return graph
 
