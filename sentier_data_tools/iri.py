@@ -14,6 +14,7 @@ def convert_json_object(obj: dict) -> URIRef | Literal:
         return URIRef(obj['value'])
     else:
         error_msg = f"Unknown object type {obj['type']}"
+        logger.error(error_msg)
         raise ValueError(error_msg)
 
 
