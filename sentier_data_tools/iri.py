@@ -19,7 +19,7 @@ class VocabIRI(URIRef):
     def triples(self, *, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
         """Return a list of triples with `rdflib` objects"""
         if subject:
-            QUERY = f"""
+            query = f"""
                 SELECT ?s ?p ?o
                 FROM <{self.graph_url}>
                 WHERE {{
@@ -29,7 +29,7 @@ class VocabIRI(URIRef):
             """
             
         else:
-            QUERY = f"""
+            query = f"""
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 SELECT ?s ?p ?o
                 FROM <{self.graph_url}>
@@ -39,11 +39,11 @@ class VocabIRI(URIRef):
                 }}
             """
         if limit is not None:
-            QUERY += f"LIMIT {int(limit)}"
+            query += f"LIMIT {int(limit)}"
         sparql = SPARQLWrapper(VOCAB_FUSEKI)
         sparql.setReturnFormat(JSON)
-        sparql.setQuery(QUERY)
-        logger.debug(f"Executing query:\n{QUERY}")
+        sparql.setQuery(query)
+        logger.debug(f"Executing query:\n{query}")
         results = sparql.queryAndConvert()["results"]["bindings"]
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
