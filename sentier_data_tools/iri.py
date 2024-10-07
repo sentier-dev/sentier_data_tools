@@ -24,13 +24,14 @@ class VocabIRI(URIRef):
     def triples(
         self,
         *,
-        triple_position: TriplePosition = TriplePosition.SUBJECT,
+        iri_position: TriplePosition = TriplePosition.SUBJECT,
         limit: int | None = 25,
     ) -> list[tuple]:
         """Get triples from the sentier.dev vocabulary for the given IRI.
 
         Args:
-            triple_position (TriplePosition, optional): The position of the IRI in the triple. Can be SUBJECT, PREDICATE, or OBJECT. Defaults to TriplePosition.SUBJECT.
+            iri_position (TriplePosition, optional): The position of the IRI in the triple.
+                Can be SUBJECT, PREDICATE, or OBJECT. Defaults to TriplePosition.SUBJECT.
             limit (int | None, optional): The maximum number of triples to return. Defaults to 25.
 
         Returns:
@@ -46,7 +47,7 @@ class VocabIRI(URIRef):
             SELECT ?s ?p ?o
             FROM <{self.graph_url}>
             WHERE {{
-                VALUES ?{triple_position.value} {{ <{str(self)}> }}
+                VALUES ?{iri_position.value} {{ <{str(self)}> }}
                 ?s ?p ?o
             }}
         """
@@ -65,12 +66,10 @@ class VocabIRI(URIRef):
             for line in results
         ]
 
-    def graph(
-        self, *, triple_position: TriplePosition = TriplePosition.SUBJECT
-    ) -> Graph:
+    def graph(self, *, iri_position: TriplePosition = TriplePosition.SUBJECT) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
         graph = Graph()
-        for triple in self.triples(triple_position=triple_position, limit=None):
+        for triple in self.triples(iri_position=iri_position, limit=None):
             graph.add(triple)
         return graph
 
