@@ -16,7 +16,7 @@ def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
 
 
 class VocabIRI(URIRef):
-    def triples(self, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
+    def triples(self, *, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
         """Return a list of triples with `rdflib` objects"""
         if subject:
             QUERY = f"""
@@ -58,7 +58,7 @@ class VocabIRI(URIRef):
                 URIRef(str(self)),
             ) for line in results]
 
-    def graph(self, subject: bool = True) -> Graph:
+    def graph(self, *, subject: bool = True) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
         graph = Graph()
         for triple in self.triples(subject=subject, limit=None):
