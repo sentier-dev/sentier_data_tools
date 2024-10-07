@@ -7,18 +7,28 @@ from sentier_data_tools.utils import TriplePosition
 VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 
 
-def convert_json_object(obj: dict) -> URIRef | Literal:
-    """Convert a JSON-formatted SPARQL Query Result object into an rdflib URIRef or Literal."""
-    if obj["type"] == "literal":
+def convert_json_object(
+    obj: dict,
+) -> URIRef | Literal:
+    """Convert a SPARQL result object to rdflib URIRef or Literal."""
+    obj_type = obj.get("type")
+
+    if obj_type == "literal":
         return Literal(
-            obj["value"], lang=obj.get("xml:lang"), datatype=obj.get("datatype")
+            obj["value"],
+            lang=obj.get("xml:lang"),
+            datatype=obj.get("datatype"),
         )
-    elif obj["type"] == "uri":
+    if obj_type == "uri":
         return URIRef(obj["value"])
+
+    if obj_type is None:
+        error_msg = f"Missing 'type' key in object: {obj}."
     else:
-        error_msg = f"Unknown object type {obj['type']}"
-        logger.error(error_msg)
-        raise ValueError(error_msg)
+        error_msg = f"Unknown object type '{obj_type}' in object: {obj}"
+
+    logger.error(error_msg)
+    raise ValueError(error_msg)
 
 
 class VocabIRI(URIRef):
@@ -65,14 +75,28 @@ class VocabIRI(URIRef):
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
         return [
-            tuple(convert_json_object(line[key]) for key in ["s", "p", "o"])
+            tuple(
+                convert_json_object(line[key])
+                for key in [
+                    "s",
+                    "p",
+                    "o",
+                ]
+            )
             for line in results
         ]
 
-    def graph(self, *, iri_position: TriplePosition = TriplePosition.SUBJECT) -> Graph:
-        """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI."""
+    def graph(
+        self,
+        *,
+        iri_position: TriplePosition = TriplePosition.SUBJECT,
+    ) -> Graph:
+        """Return a graph of the triples for this IRI."""
         graph = Graph()
-        for triple in self.triples(iri_position=iri_position, limit=None):
+        for triple in self.triples(
+            iri_position=iri_position,
+            limit=None,
+        ):
             graph.add(triple)
         return graph
 
