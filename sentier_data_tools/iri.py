@@ -50,14 +50,7 @@ class VocabIRI(URIRef):
         results = sparql.queryAndConvert()["results"]["bindings"]
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
-        return [
-            (
-                convert_json_object(line['s']),
-                convert_json_object(line['p']),
-                convert_json_object(line['o'])
-            )
-            for line in results
-        ]
+        return [tuple(convert_json_object(line[key]) for key in ['s', 'p', 'o']) for line in results]
 
     def graph(self, *, subject: bool = True) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
