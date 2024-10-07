@@ -36,6 +36,12 @@ class VocabIRI(URIRef):
         Returns:
             list[tuple]: A list of triples from the sentier.dev vocabulary.
         """
+        # Ensure graph_url is defined in the subclass
+        if not getattr(self, "graph_url", None):
+            error_msg = f"{self.__class__.__name__}, must define a class-level 'graph_url' attribute."
+            logger.error(error_msg)
+            raise AttributeError(error_msg)
+
         query = f"""
             SELECT ?s ?p ?o
             FROM <{self.graph_url}>
@@ -59,7 +65,9 @@ class VocabIRI(URIRef):
             for line in results
         ]
 
-    def graph(self, *, triple_position: TriplePosition = TriplePosition.SUBJECT) -> Graph:
+    def graph(
+        self, *, triple_position: TriplePosition = TriplePosition.SUBJECT
+    ) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
         graph = Graph()
         for triple in self.triples(triple_position=triple_position, limit=None):
