@@ -3,8 +3,8 @@
 __all__ = (
     "__version__",
     "Datapackage",
+    "DefaultDataSource",
     "Dataframe",
-    "example_data_dir",
     "GeonamesIRI",
     "ModelTermIRI",
     "ProductIRI",
@@ -12,18 +12,12 @@ __all__ = (
     "UnitIRI",
 )
 
-__version__ = "0.1.3"
-
-from pathlib import Path
+__version__ = "0.2"
 
 from sentier_data_tools.datapackage import Datapackage
 from sentier_data_tools.iri import GeonamesIRI, ModelTermIRI, ProductIRI, UnitIRI
-from sentier_data_tools.local_data_store import (
+from sentier_data_tools.local_storage import (
     Dataframe,
-    db,
-    initialize_local_database,
+    DefaultDataSource,
     reset_local_database,
 )
-
-initialize_local_database(db)
-example_data_dir = Path(__file__).parent.resolve() / "example_data"

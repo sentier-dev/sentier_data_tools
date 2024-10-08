@@ -3,7 +3,7 @@ from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI
 from sentier_data_tools.logs import stdout_feedback_logger
 
 
-class Electrolyzer(SentierModel):
+class ElectrolyzerModel(SentierModel):
     provides = [ProductIRI("http://data.europa.eu/xsp/cn2024/280410000080")]
     needs = []
 

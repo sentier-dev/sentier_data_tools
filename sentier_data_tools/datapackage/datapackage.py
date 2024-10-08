@@ -6,7 +6,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from sentier_data_tools.datapackage_validation import Contributors, DatapackageMetadata
+from sentier_data_tools.datapackage.validation import Contributors, DatapackageMetadata
 from sentier_data_tools.licenses import LICENSES
 
 

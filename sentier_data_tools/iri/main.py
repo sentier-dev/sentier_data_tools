@@ -1,43 +1,15 @@
-import locale
-import platform
-from collections import deque, defaultdict
-from functools import lru_cache
-from itertools import groupby
 from typing import List, Optional, Union
 
-from rdflib import Graph, Literal, URIRef
-from SPARQLWrapper import JSON, SPARQLWrapper
+from rdflib import Graph, URIRef
 
+from sentier_data_tools.iri.utils import (
+    VOCAB_FUSEKI,
+    convert_json_object,
+    display_value_for_uri,
+    execute_sparql_query,
+    resolve_hierarchy,
+)
 from sentier_data_tools.logs import stdout_feedback_logger as logger
-
-if platform.system() == "Windows":
-    import ctypes
-
-    windll = ctypes.windll.kernel32
-    windll.GetUserDefaultUILanguage()
-    language = locale.windows_locale[windll.GetUserDefaultUILanguage()]
-else:
-    language = locale.getlocale()[0]
-
-VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
-
-
-sparql = SPARQLWrapper(VOCAB_FUSEKI)
-sparql.setReturnFormat(JSON)
-
-
-def execute_sparql_query(query: str) -> list:
-    sparql.setQuery(query)
-    return sparql.queryAndConvert()["results"]["bindings"]
-
-
-def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
-    if obj["type"] == "literal":
-        return Literal(
-            obj["value"], lang=obj.get("xml:lang"), datatype=obj.get("datatype")
-        )
-    else:
-        return URIRef(obj["value"])
 
 
 class VocabIRI(URIRef):
@@ -96,7 +68,9 @@ class VocabIRI(URIRef):
             graph.add(triple)
         return graph
 
-    def narrower(self, include_self: bool = False, raw_strings: bool = False) -> list["VocabIRI"]:
+    def narrower(
+        self, include_self: bool = False, raw_strings: bool = False
+    ) -> Union[list["VocabIRI"], list[str]]:
         QUERY = f"""
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -107,25 +81,37 @@ WHERE {{
     ?o skos:broader ?s .
 }}"""
         logger.debug(f"Executing query:\n{QUERY}")
-        results = [(elem['s']['value'], elem['o']['value']) for elem in execute_sparql_query(QUERY)]
+        results = [
+            (elem["s"]["value"], elem["o"]["value"])
+            for elem in execute_sparql_query(QUERY)
+        ]
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
+        ordered = resolve_hierarchy(results, str(self), include_self)
 
-        ordered, queue, grouped = [], deque([str(self)]), defaultdict(list)
-        for s, o in results:
-            grouped[s].append(o)
+        if raw_strings:
+            return ordered
+        else:
+            return [self.__class__(elem) for elem in ordered]
 
-        if include_self:
-            ordered.append(str(self))
+    def broader(
+        self, include_self: bool = False, raw_strings: bool = False
+    ) -> Union[list["VocabIRI"], list[str]]:
+        QUERY = f"""
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-        while queue:
-            current = queue.popleft()
-            if current in grouped:
-                for code in grouped[current]:
-                    if code in ordered:
-                        continue
-                    ordered.append(URIRef(code))
-                    if code in grouped:
-                        queue.append(code)
+SELECT ?o ?s
+FROM <{self.graph_url}>
+WHERE {{
+    <{str(self)}> skos:broader+ ?o .
+    ?o skos:narrower ?s .
+}}"""
+        logger.debug(f"Executing query:\n{QUERY}")
+        results = [
+            (elem["s"]["value"], elem["o"]["value"])
+            for elem in execute_sparql_query(QUERY)
+        ]
+        logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
+        ordered = resolve_hierarchy(results, str(self), include_self)
 
         if raw_strings:
             return ordered
@@ -155,40 +141,3 @@ class FlowIRI(VocabIRI):
 
 class GeonamesIRI(URIRef):
     pass
-
-
-@lru_cache(maxsize=2048)
-def display_value_for_uri(
-    iri: str,
-    kind: str,
-    graph_url: str,
-    language: str = language,
-    fallback_language: str = "en",
-) -> str:
-    QUERY = f"""
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-SELECT ?label
-FROM <{graph_url}>
-WHERE {{
-<{iri}> skos:prefLabel ?label .
-FILTER (strstarts(lang(?label), '{language.lower()[:2]}'))
-}}"""
-    results = execute_sparql_query(QUERY)
-
-    if not results:
-        QUERY = f"""
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-    SELECT ?label
-    FROM <{graph_url}>
-    WHERE {{
-    <{iri}> skos:prefLabel ?label .
-    FILTER (strstarts(lang(?label), '{fallback_language.lower()[:2]}'))
-    }}"""
-        results = execute_sparql_query(QUERY)
-
-    if results:
-        return f"<{iri}>: {results[0]['label']['value']} ({kind})"
-    else:
-        return f"<{iri}>: Missing label ({kind})"

@@ -32,10 +32,12 @@ dependencies = [
     "openpyxl",
     "pandas",
     "peewee",
-    "pyarrow",
+    "peewee-enum-field",
     "platformdirs",
+    "pyarrow",
     "pydantic",
     "rdflib",
+    "rfc3987",
     "SPARQLWrapper",
     "structlog",
 ]
@@ -67,7 +69,13 @@ dev = [
 [tool.setuptools]
 license-files = ["LICENSE"]
 include-package-data = true
-packages = ["sentier_data_tools"]
+packages = [
+    "sentier_data_tools",
+    "sentier_data_tools.datapackage",
+    "sentier_data_tools.example",
+    "sentier_data_tools.iri",
+    "sentier_data_tools.local_storage",
+]
 
 [tool.setuptools.dynamic]
 version = {attr = "sentier_data_tools.__version__"}
