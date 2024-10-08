@@ -79,4 +79,12 @@ class ProductIRI(VocabIRI):
 
 
 class UnitIRI(VocabIRI):
-    graph_url = "https://vocab.sentier.dev/qudt/"
+    graph_url = "https://vocab.sentier.dev/units/"
+
+
+class ModelTermIRI(VocabIRI):
+    graph_url = "https://vocab.sentier.dev/model-terms/"
+
+
+class GeonamesIRI(URIRef):
+    pass

@@ -69,11 +69,15 @@ class Record(Model):
     class Meta:
         database = db
 
+    @property
+    def dataframe(self):
+        return self.data.to_pandas()
+
 
 # Function to query records by a column name
 def query_records_by_column(column_value):
     """Returns a list of records where the specified column is present."""
     query = Record.select().where(
-        fn.JSON_CONTAINS(Record.columns, f'["{column_value}"]')
+        fn.JSON_CONTAINS(Record.columns, column_value)
     )
     return list(query)
