@@ -12,7 +12,7 @@ base_dir = Path(platformdirs.user_data_dir(appname="sentier.dev", appauthor="DdS
 sqlite_dir_platformdirs = base_dir / "local-data-store"
 sqlite_dir_platformdirs.mkdir(exist_ok=True, parents=True)
 
-DB_NAME = "records.db"
+DB_NAME = "datapackages.db"
 db = SqliteExtDatabase(sqlite_dir_platformdirs / DB_NAME)
 
 
@@ -61,6 +61,7 @@ class Datapackage(Model):
 
 class Record(Model):
     data = FeatherField()
+    product = TextField()
     columns = JSONField()
     units = JSONField()
     datapackage = ForeignKeyField(Datapackage, backref="records")
