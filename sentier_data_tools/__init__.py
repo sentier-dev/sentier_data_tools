@@ -3,17 +3,18 @@
 __all__ = (
     "__version__",
     "Datapackage",
-    "ProductIRI",
+    "DatapackageWriter" "ProductIRI",
     "Record",
     "UnitIRI",
     "example_data_dir",
     "reset_local_database",
 )
 
-__version__ = "0.1"
+__version__ = "0.1.2"
 
 from pathlib import Path
 
+from sentier_data_tools.datapackage import DatapackageWriter
 from sentier_data_tools.iri import ProductIRI, UnitIRI
 from sentier_data_tools.local_data_store import (
     Datapackage,
