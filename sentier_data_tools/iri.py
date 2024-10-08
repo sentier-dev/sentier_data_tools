@@ -106,18 +106,24 @@ class VocabIRI(URIRef):
 
 
 class ProductIRI(VocabIRI):
-    """Class for standard queries for IRIs from the products vocabulary."""
+    """Standard queries for IRIs from the Products vocabulary."""
 
     graph_url = "https://vocab.sentier.dev/products/"
 
 
 class UnitIRI(VocabIRI):
+    """Standard queries for IRIs from the Units vocabulary."""
+
     graph_url = "https://vocab.sentier.dev/units/"
 
 
 class ModelTermIRI(VocabIRI):
+    """Standard queries for IRIs from the Model Terms vocabulary."""
+
     graph_url = "https://vocab.sentier.dev/model-terms/"
 
 
 class GeonamesIRI(URIRef):
-    pass
+    """Standard queries for IRIs from the external GeoNames vocabulary."""
+
+    graph_url = "https://www.geonames.org/"
