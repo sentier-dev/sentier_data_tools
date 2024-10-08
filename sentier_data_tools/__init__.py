@@ -5,6 +5,7 @@ __all__ = (
     "Datapackage",
     "DefaultDataSource",
     "Dataframe",
+    "DataframeKind",
     "GeonamesIRI",
     "ModelTermIRI",
     "ProductIRI",
@@ -18,6 +19,7 @@ from sentier_data_tools.datapackage import Datapackage
 from sentier_data_tools.iri import GeonamesIRI, ModelTermIRI, ProductIRI, UnitIRI
 from sentier_data_tools.local_storage import (
     Dataframe,
+    DataframeKind,
     DefaultDataSource,
     reset_local_database,
 )

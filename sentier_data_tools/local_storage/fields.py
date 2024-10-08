@@ -41,7 +41,16 @@ class IRIField(TextField):
 
 class DataframeKind(StrEnum):
     # Ideally these would be IRIs in the vocab, and be better informed by standards and provenance
-    PRODUCT = "Technical performance and inventory data for products and systems"
-    SCENARIO = "Data generated from fore- and nowcasting"
-    STATISTICS = "General historical statistical data without links to specific "
-    MFA = "Data from MFA (material flow analysis)"
+    # Model input parameters and supporting data for executing models. Often measured data or
+    # information gathered from technical performance specifications.
+    PARAMETERS = "Model input parameters"
+    # Broad data about society and economy, including future scenarios. Can include installed
+    # capacities or other data which can be used directly for creating virtual markets. Can include
+    # prices.
+    BROAD = "Broad data about society and economy"
+    # Bill of materials to produce a component or assembly. Always in relation to a given output.
+    BOM = "Bill of materials, energy, and services"
+    # Specific data on composition. Different than model parameters in that these can be
+    # individual elements (e.g. for MFA), but are related to a given output (product or economic
+    # sector)
+    COMPOSITION = "Composition of goods and wastes"

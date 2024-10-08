@@ -19,18 +19,18 @@ DB_NAME = "dataframe.db"
 sqlite_db = SqliteExtDatabase(sqlite_dir_platformdirs / DB_NAME)
 
 
-def initialize_local_database(db: SqliteExtDatabase):
+def initialize_local_database(db: SqliteExtDatabase) -> None:
     """Initialize the database, creating tables if they do not exist."""
     db.connect(reuse_if_open=True)
     db.create_tables([Dataframe], safe=True)
     db.close()
 
 
-def global_location_default():
+def global_location_default() -> str:
     return "https://sws.geonames.org/6295630/"
 
 
-def reset_local_database():
+def reset_local_database() -> None:
     """Initialize the database, creating tables if they do not exist."""
     Dataframe.delete().execute()
 
@@ -43,9 +43,11 @@ class Dataframe(Model):
     location = IRIField(default=global_location_default)
     valid_from = DateField()
     valid_to = DateField()
-    columns = JSONField()  # Includes units
+    columns = JSONField()
     metadata = JSONField()
     version = IntegerField()
+
+    # TODO: BOM must have "determining_value" column in metadata
 
     class Meta:
         database = sqlite_db

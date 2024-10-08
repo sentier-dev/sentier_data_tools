@@ -65,6 +65,52 @@ def create_example_local_datastorage(reset: bool = True):
             valid_to=date(2028, 1, 1),
         ).save()
 
+    sdt.Dataframe(
+        name="Estimated PEM electrolyzer Stack materials",
+        data=pd.DataFrame(PEM_STACK),
+        product="https://vocab.sentier.dev/products/pem-electrolyzer",
+        columns=PEM_STACK_COLUMNS,
+        location="https://sws.geonames.org/6255148/",
+        metadata=metadata
+        | {
+            "determining_value": "https://vocab.sentier.dev/model-terms/energy/nom_power_cons"
+        },
+        version=1,
+        valid_from=date(2018, 1, 1),
+        valid_to=date(2028, 1, 1),
+    ).save()
+
+    sdt.Dataframe(
+        name="electrolyzer water consumption value",
+        data=pd.DataFrame([{"http://data.europa.eu/xsp/cn2024/285390100080": 14.0}]),
+        product="https://vocab.sentier.dev/products/electrolyzer",
+        columns=[
+            {
+                "iri": "http://data.europa.eu/xsp/cn2024/285390100080",
+                "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+            }
+        ],
+        metadata={
+            "description": "...water needs per kg of H2 are reported.. ranging from 10.01 to 22.40 l per kg of H2.",
+            "homepage": "https://www.sciencedirect.com/science/article/abs/pii/S0959652621023428",
+            "contributors": [
+                {
+                    "title": "Sofia Simoes",
+                    "path": "https://orcid.org/0000-0003-4304-1411",
+                    "role": "author",
+                },
+                {
+                    "title": "Chris Mutel",
+                    "path": "https://chris.mutel.org/",
+                    "role": "wrangler",
+                },
+            ],
+        },
+        version=1,
+        valid_from=date(2018, 1, 1),
+        valid_to=date(2028, 1, 1),
+    ).save()
+
 
 COLUMNS = [
     "https://vocab.sentier.dev/model-terms/generic/company",
@@ -119,13 +165,91 @@ UNITS = [
 ]
 
 TYPES = [
-    ("PEM", "https://vocab.sentier.dev/products/en/page/pem-electrolyzer"),
+    ("PEM", "https://vocab.sentier.dev/products/pem-electrolyzer"),
     ("AEC", "https://vocab.sentier.dev/products/aec-electrolyzer"),
     ("SOEC", "https://vocab.sentier.dev/products/soel-electrolyzer"),
 ]
 
 LIFETIMES = {
-    "https://vocab.sentier.dev/products/en/page/pem-electrolyzer": 20,
+    "https://vocab.sentier.dev/products/pem-electrolyzer": 20,
     "https://vocab.sentier.dev/products/aec-electrolyzer": 27.5,
     "https://vocab.sentier.dev/products/soel-electrolyzer": 20,
 }
+
+PEM_STACK = [
+    {
+        "https://vocab.sentier.dev/model-terms/electrolyser/stack": 1.00,
+        "http://data.europa.eu/xsp/cn2024/760611000010": 27.00,
+        "http://data.europa.eu/xsp/cn2024/810890500080": 528.00,
+        "https://vocab.sentier.dev/products/tetrafluoroethylene": 16.00,
+        "http://data.europa.eu/xsp/cn2024/280300000080": 4.50,
+        "http://data.europa.eu/xsp/cn2024/711041000010": 0.80,
+        "http://data.europa.eu/xsp/cn2024/711019100080": 0.08,
+        "http://data.europa.eu/xsp/cn2024/280300000080": 4.50,
+        "http://data.europa.eu/xsp/cn2024/740900000080": 4.50,
+        "http://data.europa.eu/xsp/cn2024/722000000080": 100.00,
+        "http://data.europa.eu/xsp/cn2024/401693000080": 4.80,
+        "http://data.europa.eu/xsp/cn2024/271600000080": 103890.77,
+    }
+]
+PEM_STACK_COLUMNS = [
+    {
+        "iri": "https://vocab.sentier.dev/model-terms/energy/nom_power_cons",
+        "unit": "https://vocab.sentier.dev/units/unit/MegaW",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/760611000010",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "end plate",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/810890500080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "bipolar plate",
+    },
+    {
+        "iri": "https://vocab.sentier.dev/products/tetrafluoroethylene",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "comment": "membrane polymer",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/280300000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "electrocatalyst anode",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/711041000010",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "electrocatalyst anode",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/711019100080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "electrocatalyst cathode",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/280300000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "electrocatalyst cathode",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/740900000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "component": "current collector",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/722000000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "comment": "bolts and screws",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/401693000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+        "comment": "gasket",
+    },
+    {
+        "iri": "http://data.europa.eu/xsp/cn2024/271600000080",
+        "unit": "https://vocab.sentier.dev/units/unit/KiloW-HR",
+        "comment": "assembly energy",
+    },
+]
