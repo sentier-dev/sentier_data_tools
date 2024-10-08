@@ -112,8 +112,6 @@ class ProductIRI(VocabIRI):
 
 
 class UnitIRI(VocabIRI):
-    """Class for standard queries for IRIs from the units vocabulary."""
-
     graph_url = "https://vocab.sentier.dev/units/"
 
 
