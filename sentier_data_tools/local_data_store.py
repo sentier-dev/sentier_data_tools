@@ -5,28 +5,27 @@ from typing import Union
 import pandas as pd
 import platformdirs
 import pyarrow as pa
-from peewee import BlobField, ForeignKeyField, IntegerField, Model, TextField, fn
+from peewee import BlobField, IntegerField, Model, TextField, fn
 from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 
 base_dir = Path(platformdirs.user_data_dir(appname="sentier.dev", appauthor="DdS"))
 sqlite_dir_platformdirs = base_dir / "local-data-store"
 sqlite_dir_platformdirs.mkdir(exist_ok=True, parents=True)
 
-DB_NAME = "datapackages.db"
+DB_NAME = "dataframes.db"
 db = SqliteExtDatabase(sqlite_dir_platformdirs / DB_NAME)
 
 
 def initialize_local_database(db: SqliteExtDatabase):
     """Initialize the database, creating tables if they do not exist."""
     db.connect(reuse_if_open=True)
-    db.create_tables([Record, Datapackage], safe=True)
+    db.create_tables([Dataframe], safe=True)
     db.close()
 
 
 def reset_local_database():
     """Initialize the database, creating tables if they do not exist."""
-    Record.delete().execute()
-    Datapackage.delete().execute()
+    Dataframe.delete().execute()
 
 
 class FeatherField(BlobField):
@@ -50,21 +49,14 @@ class FeatherField(BlobField):
         return reader.read_all()
 
 
-class Datapackage(Model):
+class Dataframe(Model):
     name = TextField()
-    metadata = JSONField()
-    version = IntegerField()
-
-    class Meta:
-        database = db
-
-
-class Record(Model):
     data = FeatherField()
     product = TextField()
     columns = JSONField()
+    metadata = JSONField()
+    version = IntegerField()
     units = JSONField()
-    datapackage = ForeignKeyField(Datapackage, backref="records")
 
     class Meta:
         database = db
@@ -74,10 +66,14 @@ class Record(Model):
         return self.data.to_pandas()
 
 
+class DefaultDataSource:
+    @classmethod
+    def foo(cls) -> None:
+        pass
+
+
 # Function to query records by a column name
 def query_records_by_column(column_value):
     """Returns a list of records where the specified column is present."""
-    query = Record.select().where(
-        fn.JSON_CONTAINS(Record.columns, column_value)
-    )
+    query = Dataframe.select().where(fn.JSON_CONTAINS(Dataframe.columns, column_value))
     return list(query)
