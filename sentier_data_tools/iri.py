@@ -71,7 +71,7 @@ class VocabIRI(URIRef):
             SELECT ?s ?p ?o
             FROM <{self.graph_url}>
             WHERE {{
-                VALUES ?{iri_position.value} {{ <{self!s}> }}
+                VALUES ?{iri_position.value} {{ <{str(self)}> }}
                 ?s ?p ?o
             }}
         """
@@ -85,7 +85,10 @@ class VocabIRI(URIRef):
         results = sparql.queryAndConvert()["results"]["bindings"]
         logger.info("Retrieved %d triples from %s", len(results), VOCAB_FUSEKI)
 
-        return [tuple(convert_json_object(line[key]) for key in ["s", "p", "o"]) for line in results]
+        return [
+            tuple(convert_json_object(line[key]) for key in ["s", "p", "o"])
+            for line in results
+        ]
 
     def graph(
         self,
