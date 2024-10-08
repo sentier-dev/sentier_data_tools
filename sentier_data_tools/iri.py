@@ -86,14 +86,7 @@ class VocabIRI(URIRef):
         logger.info("Retrieved %d triples from %s", len(results), VOCAB_FUSEKI)
 
         return [
-            tuple(
-                convert_json_object(line[key])
-                for key in [
-                    "s",
-                    "p",
-                    "o",
-                ]
-            )
+            tuple(convert_json_object(line[key]) for key in ["s", "p", "o"])
             for line in results
         ]
 
