@@ -10,7 +10,7 @@ from sentier_data_tools.datapackage_validation import Contributors, DatapackageM
 from sentier_data_tools.licenses import LICENSES
 
 
-class Datapackage:
+class DatapackageWriter:
     def __init__(
         self,
         *,

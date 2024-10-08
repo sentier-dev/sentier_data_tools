@@ -1,0 +1,2 @@
+include sentier_data_tools/example_data/*.xlsx
+exclude sentier_data_tools/example_data/~*.xlsx

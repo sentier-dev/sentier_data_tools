@@ -32,6 +32,7 @@ dependencies = [
     "openpyxl",
     "pandas",
     "peewee",
+    "pyarrow",
     "platformdirs",
     "pydantic",
     "rdflib",
