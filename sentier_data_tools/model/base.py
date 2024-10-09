@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
+import itertools
 
 import pandas as pd
 
@@ -42,8 +43,10 @@ class SentierModel(ABC):
             raise ValueError("Duplicates alias labels in `provides`")
 
     def inject_needs_provides_into_class(self) -> None:
-        for key, value in self.needs.items():
-            if hasattr(self, value):
+        for key, value in itertools.chain(self.needs.items(), self.provides.items()):
+            if getattr(self, key, None) == value:
+                continue
+            elif hasattr(self, value):
                 if hasattr(self, f"var_{value}"):
                     raise ValueError(f"Alias `{value}` conflicts with existing attribute")
                 logger.info(f"Changing alias `{value}` to `var_{value}`")
