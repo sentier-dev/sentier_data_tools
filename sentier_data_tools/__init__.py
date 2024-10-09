@@ -18,7 +18,7 @@ __all__ = (
     "UnitIRI",
 )
 
-__version__ = "0.2"
+__version__ = "0.3"
 
 from sentier_data_tools.datapackage import Datapackage
 from sentier_data_tools.iri import (
