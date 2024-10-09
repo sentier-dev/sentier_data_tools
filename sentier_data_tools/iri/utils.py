@@ -2,19 +2,22 @@ import locale
 import platform
 from collections import defaultdict, deque
 from functools import lru_cache
+import os
 from typing import Union
 
 from rdflib import Literal, URIRef
 from SPARQLWrapper import JSON, SPARQLWrapper
 
-if platform.system() == "Windows":
+if language := os.environ.get("SDT_LOCALE"):
+    pass
+elif platform.system() == "Windows":
     import ctypes
 
     windll = ctypes.windll.kernel32
     windll.GetUserDefaultUILanguage()
-    language = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+    language = locale.windows_locale[windll.GetUserDefaultUILanguage()] or "en"
 else:
-    language = locale.getlocale()[0]
+    language = locale.getlocale()[0] or "en"  # Sigh...
 
 VOCAB_FUSEKI = "https://fuseki.d-d-s.ch/skosmos/query"
 
