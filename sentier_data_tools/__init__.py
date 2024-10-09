@@ -19,7 +19,7 @@ __all__ = (
     "get_conversion_factor",
 )
 
-__version__ = "0.3"
+__version__ = "0.4"
 
 from sentier_data_tools.datapackage import Datapackage
 from sentier_data_tools.iri import (

@@ -71,25 +71,26 @@ class DatasetKind(StrEnum):
 
 
 class ColumnsField(JSONField):
-    def db_value(self, value: list[dict]) -> str:
-        try:
-            value = [
-                {COLUMN_MAPPING[key]: value for key, value in elem.items()}
-                for elem in value
-            ]
-        except KeyError as exc:
-            raise KeyError(
-                "Column keys must be one of the following: {}".format(
-                    list(COLUMN_MAPPING.keys())
-                )
-            ) from exc
-        return super().db_value(value)
+    # def db_value(self, value: list[dict]) -> str:
+    #     try:
+    #         value = [
+    #             {COLUMN_MAPPING[key]: value for key, value in elem.items()}
+    #             for elem in value
+    #         ]
+    #     except KeyError as exc:
+    #         raise KeyError(
+    #             "Column keys must be one of the following: {}".format(
+    #                 list(COLUMN_MAPPING.keys())
+    #             )
+    #         ) from exc
+    #     return super().db_value(value)
 
-    def python_value(self, value: str) -> list[dict]:
-        value = super().python_value(value)
-        return [
-            {COLUMN_MAPPING_REVERSED[k]: v for k, v in elem.items()} for elem in value
-        ]
+    # def python_value(self, value: str) -> list[dict]:
+    #     value = super().python_value(value)
+    #     return [
+    #         {COLUMN_MAPPING_REVERSED[k]: v for k, v in elem.items()} for elem in value
+    #     ]
+    ...
 
 
 COLUMN_MAPPING = {

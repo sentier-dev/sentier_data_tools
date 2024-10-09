@@ -1,6 +1,8 @@
 import itertools
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from datetime import date
+from typing import Optional
 
 import pandas as pd
 
@@ -14,6 +16,7 @@ from sentier_data_tools.model.arguments import Demand, Flow, RunConfig
 class SentierModel(ABC):
     def __init__(self, demand: Demand, run_config: RunConfig):
         self.demand = demand
+        self.timeline = defaultdict(list)
         self.run_config = run_config
         if self.demand.begin_date is None:
             self.demand.begin_date = date(date.today().year - 5, 1, 1)
@@ -21,6 +24,41 @@ class SentierModel(ABC):
             self.demand.end_date = date(date.today().year + 4, 1, 1)
         self.validate_needs_provides()
         self.inject_needs_provides_into_class()
+
+    def add_edges(
+        self,
+        dataframe: pd.DataFrame,
+        column_metadata: list,
+        assembly: str,
+        weighting_column: Optional[str] = None,
+    ) -> None:
+        for column_name in dataframe.columns:
+            # TODO: Use timestamp column to determine temporal bounds
+            # TODO: Use location column to determine spatial bounds
+
+            if column_name in self.needs_reverse:
+                column_name = self.needs_reverse[column_name]
+            if column_name in self.provides_reverse:
+                column_name = self.provides_reverse[column_name]
+
+            series = dataframe[column_name]
+            if len(series) > 1 and weighting_column:
+                weighted = series * dataframe[weighting_column]
+                weights = weighted / weighted.dropna().sum()
+                value = (series * weights).mean()
+            else:
+                value = series.mean()
+            # self.timeline[assembly].append(
+            #     Demand(
+            #         product_iri: ProductIRI
+            #         unit_iri: UnitIRI
+            #         amount: float
+            #         spatial_context: GeonamesIRI = GeonamesIRI("https://sws.geonames.org/6295630/")
+            #         properties: Optional[list] = None
+            #         begin_date: Optional[date] = None
+            #         end_date: Optional[date] = None
+            #     )
+            # )
 
     def validate_needs_provides(self):
         if not isinstance(self.needs, dict):
@@ -41,6 +79,8 @@ class SentierModel(ABC):
             raise ValueError("Duplicates alias labels in `needs`")
         if len(set(self.provides.values())) != len(self.provides):
             raise ValueError("Duplicates alias labels in `provides`")
+        self.provides_reverse = {v: k for k, v in self.provides.items()}
+        self.needs_reverse = {v: k for k, v in self.needs.items()}
 
     def inject_needs_provides_into_class(self) -> None:
         for key, value in itertools.chain(self.needs.items(), self.provides.items()):
@@ -70,9 +110,12 @@ class SentierModel(ABC):
         pass
 
     def get_model_data(
-        self, product: VocabIRI, kind: DatasetKind, relabel_columns: bool = True
+        self,
+        product: VocabIRI,
+        kind: DatasetKind,
+        relabel_columns: bool = True,
     ) -> dict:
-        return {
+        results = {
             "exactMatch": list(
                 Dataset.select().where(
                     Dataset.kind == kind,
@@ -92,6 +135,15 @@ class SentierModel(ABC):
                 )
             ),
         }
+        if relabel_columns:
+            for ds in itertools.chain(*results.values()):
+                ds.dataframe.rename(
+                    columns={str(k): v for k, v in self.provides.items()}, inplace=True
+                )
+                ds.dataframe.rename(
+                    columns={str(k): v for k, v in self.needs.items()}, inplace=True
+                )
+        return results
 
     def merge_datasets_to_dataframes(self, lst: list[Dataset]) -> pd.DataFrame:
         if not lst:
@@ -99,7 +151,7 @@ class SentierModel(ABC):
         elif len(lst) == 1:
             return lst[0].dataframe
         else:
-            given = lst.pop(0)
+            given = lst.pop(0).dataframe
             while lst:
-                given = pd.merge(given, lst.pop(0), how="outer")
+                given = pd.merge(given, lst.pop(0).dataframe, how="outer")
             return given

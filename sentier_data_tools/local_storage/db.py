@@ -8,8 +8,8 @@ from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 from sentier_data_tools.local_storage.fields import (
     ColumnsField,
     DatasetKind,
-    PandasFeatherField,
     GeonamesIRIField,
+    PandasFeatherField,
     ProductIRIField,
 )
 

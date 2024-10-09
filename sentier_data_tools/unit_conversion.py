@@ -2,8 +2,8 @@ from functools import lru_cache
 from typing import List, Optional
 
 from sentier_data_tools.iri import UnitIRI
-from sentier_data_tools.logs import stdout_feedback_logger as logger
 from sentier_data_tools.iri.utils import execute_sparql_query
+from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 UNITS_GRAPH = "https://vocab.sentier.dev/units/"
 
@@ -28,7 +28,9 @@ WHERE {{
     result = execute_sparql_query(QUERY)
     if not result:
         raise KeyError(f"IRI `{qk}` not in units graph")
-    return {line['unit']['value']: float(line['conversion']['value']) for line in result}
+    return {
+        line["unit"]["value"]: float(line["conversion"]["value"]) for line in result
+    }
 
 
 @lru_cache(maxsize=512)
@@ -48,7 +50,7 @@ WHERE {{
     result = execute_sparql_query(QUERY)
     if not result:
         raise KeyError(f"IRI `{iri}` not in units graph")
-    return {line['quantitykind']['value'] for line in result}
+    return {line["quantitykind"]["value"] for line in result}
 
 
 @lru_cache(maxsize=2048)
@@ -58,7 +60,9 @@ def get_conversion_factor(from_iri: UnitIRI, to_iri: UnitIRI) -> float:
     common = qk1.intersection(qk2)
     if not common:
         raise ValueError("Given units have no common quantity kinds")
-    logger.debug("Found common quantity keys for %s to %s: %s", from_iri, to_iri, common)
+    logger.debug(
+        "Found common quantity keys for %s to %s: %s", from_iri, to_iri, common
+    )
     conversion_dict = {}
     for qk in common:
         conversion_dict.update(get_units_for_quantity_kind(qk))
