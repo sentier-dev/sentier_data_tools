@@ -1,4 +1,5 @@
 """Module for querying RDF triples from sentier.dev vocabularies.
+
 This module provides base classes and utility functions to handle IRIs
 and retrieve RDF triples from vocabularies like products and units using SPARQL queries.
 """
@@ -26,11 +27,13 @@ class VocabIRI(URIRef):
         limit: int | None = 25,
     ) -> list[tuple]:
         """Get triples from a sentier.dev vocabulary for the given IRI.
+
         Args:
             iri_position (TriplePosition, optional): The IRI position in the triple
                 (SUBJECT, PREDICATE, or OBJECT). Defaults to TriplePosition.SUBJECT.
             limit (int | None, optional): The maximum number of triples to return.
                 Defaults to 25.
+
         Returns:
             list[tuple]: A list of triples from a sentier.dev vocabulary.
         """
@@ -43,6 +46,7 @@ class VocabIRI(URIRef):
             logger.error(error_msg)
             raise AttributeError(error_msg)
 
+        # pylint: disable=no-member
         QUERY = f"""
             SELECT ?s ?p ?o
             FROM <{self.graph_url}>
