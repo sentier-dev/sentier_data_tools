@@ -1,6 +1,7 @@
 import locale
 import platform
 from collections import defaultdict, deque
+from enum import Enum
 from functools import lru_cache
 from typing import Union
 
@@ -96,3 +97,10 @@ def resolve_hierarchy(
                     queue.append(code)
 
     return ordered
+
+class TriplePosition(Enum):
+    """Represents the position of an object in a triple store."""
+
+    SUBJECT = "s"
+    PREDICATE = "p"
+    OBJECT = "o"

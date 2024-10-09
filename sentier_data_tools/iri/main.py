@@ -1,7 +1,13 @@
+"""Module for querying RDF triples from sentier.dev vocabularies.
+This module provides base classes and utility functions to handle IRIs
+and retrieve RDF triples from vocabularies like products and units using SPARQL queries.
+"""
+
 from rdflib import Graph, URIRef
 
 from sentier_data_tools.iri.utils import (
     VOCAB_FUSEKI,
+    TriplePosition,
     convert_json_object,
     display_value_for_uri,
     execute_sparql_query,
@@ -11,35 +17,43 @@ from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 
 class VocabIRI(URIRef):
-    def triples(self, *, subject: bool = True, limit: int | None = 25) -> list[tuple]:
-        """Return a list of triples with `rdflib` objects"""
-        if subject:
-            QUERY = f"""
-                SELECT ?s ?p ?o
-                FROM <{self.graph_url}>
-                WHERE {{
-                    VALUES ?s {{ <{str(self)}> }}
-                    ?s ?p ?o
-                }}
-            """
+    """Base class for standard queries for IRIs from sentier.dev vocabularies."""
 
-        else:
-            QUERY = f"""
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT ?s ?p ?o
-                FROM <{self.graph_url}>
-                WHERE {{
-                    VALUES ?o {{ <{str(self)}> }}
-                    ?s ?p ?o
-                }}
-            """
+    def triples(
+        self,
+        *,
+        iri_position: TriplePosition = TriplePosition.SUBJECT,
+        limit: int | None = 25,
+    ) -> list[tuple]:
+        """Get triples from a sentier.dev vocabulary for the given IRI.
+        Args:
+            iri_position (TriplePosition, optional): The IRI position in the triple
+                (SUBJECT, PREDICATE, or OBJECT). Defaults to TriplePosition.SUBJECT.
+            limit (int | None, optional): The maximum number of triples to return.
+                Defaults to 25.
+        Returns:
+            list[tuple]: A list of triples from a sentier.dev vocabulary.
+        """
+
+        QUERY = f"""
+            SELECT ?s ?p ?o
+            FROM <{self.graph_url}>
+            WHERE {{
+                VALUES ?{iri_position.value} {{ <{str(self)}> }}
+                ?s ?p ?o
+            }}
+        """
+
         if limit is not None:
             QUERY += f"LIMIT {int(limit)}"
         logger.debug(f"Executing query:\n{QUERY}")
         results = execute_sparql_query(QUERY)
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
-        return [tuple(convert_json_object(line[key]) for key in ['s', 'p', 'o']) for line in results]
+        return [
+            tuple(convert_json_object(line[key]) for key in ["s", "p", "o"])
+            for line in results
+        ]
 
     def __repr__(self) -> str:
         return self.display()
@@ -47,10 +61,17 @@ class VocabIRI(URIRef):
     def display(self) -> str:
         return display_value_for_uri(str(self), self.kind, self.graph_url)
 
-    def graph(self, *, subject: bool = True) -> Graph:
-        """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
+    def graph(
+        self,
+        *,
+        iri_position: TriplePosition = TriplePosition.SUBJECT,
+    ) -> Graph:
+        """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI."""
         graph = Graph()
-        for triple in self.triples(subject=subject, limit=None):
+        for triple in self.triples(
+            iri_position=iri_position,
+            limit=None,
+        ):
             graph.add(triple)
         return graph
 
@@ -58,14 +79,14 @@ class VocabIRI(URIRef):
         self, include_self: bool = False, raw_strings: bool = False
     ) -> list["VocabIRI"] | list[str]:
         QUERY = f"""
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT ?o ?s
-FROM <{self.graph_url}>
-WHERE {{
-    <{str(self)}> skos:narrower+ ?o .
-    ?o skos:broader ?s .
-}}"""
+            SELECT ?o ?s
+            FROM <{self.graph_url}>
+            WHERE {{
+                <{str(self)}> skos:narrower+ ?o .
+                ?o skos:broader ?s .
+            }}"""
         logger.debug(f"Executing query:\n{QUERY}")
         results = [
             (elem["s"]["value"], elem["o"]["value"])
@@ -83,14 +104,14 @@ WHERE {{
         self, include_self: bool = False, raw_strings: bool = False
     ) -> list["VocabIRI"] | list[str]:
         QUERY = f"""
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT ?o ?s
-FROM <{self.graph_url}>
-WHERE {{
-    <{str(self)}> skos:broader+ ?o .
-    ?o skos:narrower ?s .
-}}"""
+            SELECT ?o ?s
+            FROM <{self.graph_url}>
+            WHERE {{
+                <{str(self)}> skos:broader+ ?o .
+                ?o skos:narrower ?s .
+            }}"""
         logger.debug(f"Executing query:\n{QUERY}")
         results = [
             (elem["s"]["value"], elem["o"]["value"])
