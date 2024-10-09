@@ -7,6 +7,7 @@ from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI, VocabIRI
 from sentier_data_tools.local_storage.db import Dataset
 from sentier_data_tools.local_storage.fields import DatasetKind
 from sentier_data_tools.model.arguments import Demand, Flow, RunConfig
+from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 
 class SentierModel(ABC):
@@ -18,8 +19,13 @@ class SentierModel(ABC):
         if self.demand.end_date is None:
             self.demand.end_date = date(date.today().year + 4, 1, 1)
         self.validate_needs_provides()
+        self.inject_needs_provides_into_class()
 
     def validate_needs_provides(self):
+        if not isinstance(self.needs, dict):
+            raise ValueError(f"`needs` must be a `dict`; got {type(self.needs)}")
+        if not isinstance(self.provides, dict):
+            raise ValueError(f"`provides` must be a `dict`; got {type(self.provides)}")
         for elem in self.needs:
             if not isinstance(elem, VocabIRI):
                 raise ValueError(
@@ -30,14 +36,20 @@ class SentierModel(ABC):
                 raise ValueError(
                     f"Every term in `provides` must be an instance of `VocabIRI`; got {type(elem)}"
                 )
-        if isinstance(self.needs, dict) and len(set(self.needs.values())) != len(
-            self.needs
-        ):
+        if len(set(self.needs.values())) != len(self.needs):
             raise ValueError("Duplicates alias labels in `needs`")
-        if isinstance(self.provides, dict) and len(set(self.provides.values())) != len(
-            self.provides
-        ):
+        if len(set(self.provides.values())) != len(self.provides):
             raise ValueError("Duplicates alias labels in `provides`")
+
+    def inject_needs_provides_into_class(self) -> None:
+        for key, value in self.needs.items():
+            if hasattr(self, value):
+                if hasattr(self, f"var_{value}"):
+                    raise ValueError(f"Alias `{value}` conflicts with existing attribute")
+                logger.info(f"Changing alias `{value}` to `var_{value}`")
+                setattr(self, f"var_{value}", key)
+            else:
+                setattr(self, value, key)
 
     # def prepare(self) -> None:
     #     self.get_model_data()

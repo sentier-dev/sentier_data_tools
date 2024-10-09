@@ -14,7 +14,7 @@ class WaterElectrolysisModel(SentierModel):
     provides = {
         ProductIRI(
             "http://openenergy-platform.org/ontology/oeo/OEO_00010379"
-        ): "Hydrogen",
+        ): "hydrogen",
     }
     needs = {
         ModelTermIRI(
@@ -27,6 +27,10 @@ class WaterElectrolysisModel(SentierModel):
             "https://vocab.sentier.dev/model-terms/energy/elec_energy_serv_dem"
         ): "elec_energy_serv_dem",
     }
+
+    def get_electrolysis_inventory(self) -> None:
+        ...
+        # bom_electrolysis = self.get_model_data(self, product: VocabIRI, kind: DatasetKind) -> dict:
 
     def run(self) -> tuple[list[Demand], list[Flow]]:
         self.prepare()

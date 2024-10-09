@@ -4,13 +4,14 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 # from sentier_data_tools.data_source_base import DataSourceBase
-from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI
+from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI, UnitIRI
 
 # from sentier_data_tools.local_storage import DefaultDataSource
 
 
 class Demand(BaseModel):
     product_iri: ProductIRI
+    unit_iri: UnitIRI
     amount: float
     spatial_context: GeonamesIRI = GeonamesIRI("https://sws.geonames.org/6295630/")
     properties: Optional[list] = None

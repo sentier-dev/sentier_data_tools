@@ -58,6 +58,9 @@ class VocabIRI(URIRef):
                 for line in results
             ]
 
+    def __repr__(self) -> str:
+        return self.display()
+
     def display(self) -> str:
         return display_value_for_uri(str(self), self.kind, self.graph_url)
 
