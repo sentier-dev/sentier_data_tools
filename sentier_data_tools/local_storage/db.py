@@ -6,6 +6,7 @@ from peewee_enum_field import EnumField
 from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 
 from sentier_data_tools.local_storage.fields import (
+    ColumnsField,
     DataframeKind,
     FeatherField,
     IRIField,
@@ -38,12 +39,12 @@ def reset_local_database() -> None:
 class Dataframe(Model):
     name = TextField()
     data = FeatherField()
-    kind = EnumField(DataframeKind, default=DataframeKind.PRODUCT)
+    kind = EnumField(DataframeKind, default=DataframeKind.PARAMETERS)
     product = IRIField(null=True)
     location = IRIField(default=global_location_default)
     valid_from = DateField()
     valid_to = DateField()
-    columns = JSONField()
+    columns = ColumnsField()
     metadata = JSONField()
     version = IntegerField()
 

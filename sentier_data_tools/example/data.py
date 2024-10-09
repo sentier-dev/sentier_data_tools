@@ -57,7 +57,12 @@ def create_example_local_datastorage(reset: bool = True):
             name="Estimated electrolyzer BoP (balance of plant) lifetimes",
             data=pd.DataFrame([{key: value}]),
             product=key,
-            columns=[{"iri": key, "unit": "https://vocab.sentier.dev/units/unit/YR"}],
+            columns=[
+                {
+                    "iri": "https://vocab.sentier.dev/model-terms/electrolyser/product_lifetime",
+                    "unit": "https://vocab.sentier.dev/units/unit/YR",
+                }
+            ],
             location="https://sws.geonames.org/6255148/",
             metadata=metadata,
             version=1,
@@ -82,13 +87,22 @@ def create_example_local_datastorage(reset: bool = True):
 
     sdt.Dataframe(
         name="electrolyzer water consumption value",
-        data=pd.DataFrame([{"http://data.europa.eu/xsp/cn2024/285390100080": 14.0}]),
+        data=pd.DataFrame(
+            [
+                {"http://data.europa.eu/xsp/cn2024/285390100080": 14.0},
+                {"http://openenergy-platform.org/ontology/oeo/OEO_00010379": 1.0},
+            ]
+        ),
         product="https://vocab.sentier.dev/products/electrolyzer",
         columns=[
             {
                 "iri": "http://data.europa.eu/xsp/cn2024/285390100080",
                 "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-            }
+            },
+            {
+                "iri": "http://openenergy-platform.org/ontology/oeo/OEO_00010379",
+                "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
+            },
         ],
         metadata={
             "description": "...water needs per kg of H2 are reported.. ranging from 10.01 to 22.40 l per kg of H2.",
@@ -105,6 +119,7 @@ def create_example_local_datastorage(reset: bool = True):
                     "role": "wrangler",
                 },
             ],
+            "determining_value": "http://openenergy-platform.org/ontology/oeo/OEO_00010379",
         },
         version=1,
         valid_from=date(2018, 1, 1),

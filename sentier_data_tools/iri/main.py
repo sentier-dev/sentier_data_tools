@@ -133,6 +133,18 @@ class ModelTermIRI(VocabIRI):
     kind = "model-term"
     graph_url = "https://vocab.sentier.dev/model-terms/"
 
+    def narrower(self, include_self: bool = False, raw_strings: bool = False) -> list:
+        # Model terms are not arranged in a hierarchy
+        if include_self and raw_strings:
+            return [str(self)]
+        elif include_self:
+            return [self]
+        else:
+            return []
+
+    def broader(self, *args, **kwargs):
+        return self.narrower(*args, **kwargs)
+
 
 class FlowIRI(VocabIRI):
     kind = "flow"
