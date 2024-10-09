@@ -2,7 +2,7 @@ from pathlib import Path
 
 import platformdirs
 from peewee import DateField, IntegerField, Model, TextField
-from peewee_enum_field import EnumField
+from sentier_data_tools.local_storage.enum_field import EnumField
 from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 
 from sentier_data_tools.local_storage.fields import (

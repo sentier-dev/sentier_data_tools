@@ -32,7 +32,6 @@ dependencies = [
     "openpyxl",
     "pandas",
     "peewee",
-    "peewee-enum-field",
     "platformdirs",
     "pyarrow",
     "pydantic",
