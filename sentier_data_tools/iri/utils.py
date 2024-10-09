@@ -1,8 +1,8 @@
 import locale
+import os
 import platform
 from collections import defaultdict, deque
 from functools import lru_cache
-import os
 from typing import Union
 
 from rdflib import Literal, URIRef
