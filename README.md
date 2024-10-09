@@ -56,7 +56,7 @@ please [file an issue][Issue Tracker] along with a detailed description.
 You can build the documentation locally by installing the documentation Conda environment:
 
 ```bash
-conda env create -f docs/environment.yml
+conda env create -f docs/environment.yaml
 ```
 
 activating the environment
