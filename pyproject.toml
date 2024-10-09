@@ -74,6 +74,7 @@ packages = [
     "sentier_data_tools.example",
     "sentier_data_tools.iri",
     "sentier_data_tools.local_storage",
+    "sentier_data_tools.model",
 ]
 
 [tool.setuptools.dynamic]
