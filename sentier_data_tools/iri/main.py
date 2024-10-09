@@ -15,21 +15,23 @@ class VocabIRI(URIRef):
         """Return a list of triples with `rdflib` objects"""
         if subject:
             QUERY = f"""
-    SELECT ?p ?o
-    FROM <{self.graph_url}>
-    WHERE {{
-        <{str(self)}> ?p ?o
-    }}
+                SELECT ?s ?p ?o
+                FROM <{self.graph_url}>
+                WHERE {{
+                    VALUES ?s {{ <{str(self)}> }}
+                    ?s ?p ?o
+                }}
             """
+
         else:
             QUERY = f"""
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-    SELECT ?s ?p
-    FROM <{self.graph_url}>
-    WHERE {{
-        ?s ?p <{str(self)}>
-    }}
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                SELECT ?s ?p ?o
+                FROM <{self.graph_url}>
+                WHERE {{
+                    VALUES ?o {{ <{str(self)}> }}
+                    ?s ?p ?o
+                }}
             """
         if limit is not None:
             QUERY += f"LIMIT {int(limit)}"
@@ -37,24 +39,7 @@ class VocabIRI(URIRef):
         results = execute_sparql_query(QUERY)
         logger.info(f"Retrieved {len(results)} triples from {VOCAB_FUSEKI}")
 
-        if subject:
-            return [
-                (
-                    URIRef(str(self)),
-                    convert_json_object(line["p"]),
-                    convert_json_object(line["o"]),
-                )
-                for line in results
-            ]
-        else:
-            return [
-                (
-                    convert_json_object(line["s"]),
-                    convert_json_object(line["p"]),
-                    URIRef(str(self)),
-                )
-                for line in results
-            ]
+        return [tuple(convert_json_object(line[key]) for key in ['s', 'p', 'o']) for line in results]
 
     def __repr__(self) -> str:
         return self.display()
