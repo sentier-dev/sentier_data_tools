@@ -19,7 +19,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -31,6 +30,7 @@ requires-python = ">=3.11"
 dependencies = [
     "openpyxl",
     "pandas",
+    "pandas_flavor",
     "peewee",
     "platformdirs",
     "pyarrow",

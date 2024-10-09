@@ -21,6 +21,7 @@ __all__ = (
 
 __version__ = "0.4.2"
 
+import sentier_data_tools.patch_pandas
 from sentier_data_tools.datapackage import Datapackage
 from sentier_data_tools.iri import (
     FlowIRI,
