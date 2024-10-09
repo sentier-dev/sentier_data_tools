@@ -1,5 +1,3 @@
-from typing import List, Optional, Union
-
 from rdflib import Graph, URIRef
 
 from sentier_data_tools.iri.utils import (
@@ -13,7 +11,7 @@ from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 
 class VocabIRI(URIRef):
-    def triples(self, *, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
+    def triples(self, *, subject: bool = True, limit: int | None = 25) -> list[tuple]:
         """Return a list of triples with `rdflib` objects"""
         if subject:
             QUERY = f"""
@@ -73,7 +71,7 @@ class VocabIRI(URIRef):
 
     def narrower(
         self, include_self: bool = False, raw_strings: bool = False
-    ) -> Union[list["VocabIRI"], list[str]]:
+    ) -> list["VocabIRI"] | list[str]:
         QUERY = f"""
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
@@ -98,7 +96,7 @@ WHERE {{
 
     def broader(
         self, include_self: bool = False, raw_strings: bool = False
-    ) -> Union[list["VocabIRI"], list[str]]:
+    ) -> list["VocabIRI"] | list[str]:
         QUERY = f"""
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
