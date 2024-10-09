@@ -13,7 +13,7 @@ from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 
 class VocabIRI(URIRef):
-    def triples(self, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
+    def triples(self, *, subject: bool = True, limit: Optional[int] = 25) -> List[tuple]:
         """Return a list of triples with `rdflib` objects"""
         if subject:
             QUERY = f"""
@@ -64,7 +64,7 @@ class VocabIRI(URIRef):
     def display(self) -> str:
         return display_value_for_uri(str(self), self.kind, self.graph_url)
 
-    def graph(self, subject: bool = True) -> Graph:
+    def graph(self, *, subject: bool = True) -> Graph:
         """Return an `rdflib` graph of the data from the sentier.dev vocabulary for this IRI"""
         graph = Graph()
         for triple in self.triples(subject=subject, limit=None):
