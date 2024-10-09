@@ -34,6 +34,14 @@ class VocabIRI(URIRef):
         Returns:
             list[tuple]: A list of triples from a sentier.dev vocabulary.
         """
+        # Ensure a vocabulary graph_url is defined in a subclass
+        if not getattr(self, "graph_url", None):
+            error_msg = (
+                f"{self.__class__.__name__} must define a 'graph_url' attribute "
+                "to indicate the vocabulary graph URL."
+            )
+            logger.error(error_msg)
+            raise AttributeError(error_msg)
 
         QUERY = f"""
             SELECT ?s ?p ?o
