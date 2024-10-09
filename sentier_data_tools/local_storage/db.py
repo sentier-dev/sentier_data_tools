@@ -1,10 +1,11 @@
 from pathlib import Path
 
 import platformdirs
-from peewee import DateField, IntegerField, Model, TextField
-from sentier_data_tools.local_storage.enum_field import EnumField
+from peewee import DateField, IntegerField, TextField
+from playhouse.signals import Model, pre_save
 from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 
+from sentier_data_tools.local_storage.enum_field import EnumField
 from sentier_data_tools.local_storage.fields import (
     ColumnsField,
     DatasetKind,
@@ -53,3 +54,8 @@ class Dataset(Model):
 
     class Meta:
         database = sqlite_db
+
+
+@pre_save(sender=Dataset)
+def dataframe_translation(model_class, instance, created):
+    instance.dataframe.restore_column_iris()
