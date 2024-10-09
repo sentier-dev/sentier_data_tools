@@ -40,7 +40,7 @@ def create_example_local_datastorage(reset: bool = True):
         filtered.drop(labels=["Electrolysis type"], axis="columns", inplace=True)
         filtered.columns = COLUMNS
 
-        sdt.Dataframe(
+        sdt.Dataset(
             name=f"electrolyser model data for {kind.lower()}",
             data=filtered,
             product=iri,
@@ -53,7 +53,7 @@ def create_example_local_datastorage(reset: bool = True):
         ).save()
 
     for key, value in LIFETIMES.items():
-        sdt.Dataframe(
+        sdt.Dataset(
             name="Estimated electrolyzer BoP (balance of plant) lifetimes",
             data=pd.DataFrame([{key: value}]),
             product=key,
@@ -70,7 +70,7 @@ def create_example_local_datastorage(reset: bool = True):
             valid_to=date(2028, 1, 1),
         ).save()
 
-    sdt.Dataframe(
+    sdt.Dataset(
         name="Estimated PEM electrolyzer Stack materials",
         data=pd.DataFrame(PEM_STACK),
         product="https://vocab.sentier.dev/products/pem-electrolyzer",
@@ -81,19 +81,22 @@ def create_example_local_datastorage(reset: bool = True):
             "determining_value": "https://vocab.sentier.dev/model-terms/energy/nom_power_cons"
         },
         version=1,
+        kind=sdt.DatasetKind.BOM,
         valid_from=date(2018, 1, 1),
         valid_to=date(2028, 1, 1),
     ).save()
 
-    sdt.Dataframe(
-        name="electrolyzer water consumption value",
+    sdt.Dataset(
+        name="electrolysis water consumption value",
         data=pd.DataFrame(
             [
-                {"http://data.europa.eu/xsp/cn2024/285390100080": 14.0},
-                {"http://openenergy-platform.org/ontology/oeo/OEO_00010379": 1.0},
+                {
+                    "http://data.europa.eu/xsp/cn2024/285390100080": 14.0,
+                    "http://openenergy-platform.org/ontology/oeo/OEO_00010379": 1.0,
+                },
             ]
         ),
-        product="https://vocab.sentier.dev/products/electrolyzer",
+        product="http://openenergy-platform.org/ontology/oeo/OEO_00010379",
         columns=[
             {
                 "iri": "http://data.europa.eu/xsp/cn2024/285390100080",
@@ -122,6 +125,7 @@ def create_example_local_datastorage(reset: bool = True):
             "determining_value": "http://openenergy-platform.org/ontology/oeo/OEO_00010379",
         },
         version=1,
+        kind=sdt.DatasetKind.BOM,
         valid_from=date(2018, 1, 1),
         valid_to=date(2028, 1, 1),
     ).save()
@@ -215,12 +219,12 @@ PEM_STACK_COLUMNS = [
     {
         "iri": "http://data.europa.eu/xsp/cn2024/760611000010",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "end plate",
+        "assembly": "end plate",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/810890500080",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "bipolar plate",
+        "assembly": "bipolar plate",
     },
     {
         "iri": "https://vocab.sentier.dev/products/tetrafluoroethylene",
@@ -230,27 +234,27 @@ PEM_STACK_COLUMNS = [
     {
         "iri": "http://data.europa.eu/xsp/cn2024/280300000080",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "electrocatalyst anode",
+        "assembly": "electrocatalyst anode",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/711041000010",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "electrocatalyst anode",
+        "assembly": "electrocatalyst anode",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/711019100080",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "electrocatalyst cathode",
+        "assembly": "electrocatalyst cathode",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/280300000080",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "electrocatalyst cathode",
+        "assembly": "electrocatalyst cathode",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/740900000080",
         "unit": "https://vocab.sentier.dev/units/unit/KiloGM",
-        "component": "current collector",
+        "assembly": "current collector",
     },
     {
         "iri": "http://data.europa.eu/xsp/cn2024/722000000080",

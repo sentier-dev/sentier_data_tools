@@ -9,6 +9,8 @@ from peewee import BlobField, TextField
 from playhouse.sqlite_ext import JSONField
 from rdflib import URIRef
 
+from sentier_data_tools.iri import GeonamesIRI, ProductIRI
+
 
 class FeatherField(BlobField):
     def db_value(self, value: Union[pd.DataFrame, pa.Table]) -> BytesIO:
@@ -40,8 +42,18 @@ class IRIField(TextField):
         return value
 
 
+class ProductIRIField(IRIField):
+    def python_value(self, value):
+        return ProductIRI(value)
+
+
+class GeonamesIRIField(IRIField):
+    def python_value(self, value):
+        return GeonamesIRI(value)
+
+
 # Ideally these would be IRIs in the vocab, and be better informed by standards and provenance
-class DataframeKind(StrEnum):
+class DatasetKind(StrEnum):
     # Model input parameters and supporting data for executing models. Often measured data or
     # information gathered from technical performance specifications, i.e. a long dataframe
     # with information for many models or instances.

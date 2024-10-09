@@ -11,9 +11,9 @@ from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI
 
 class Demand(BaseModel):
     product_iri: ProductIRI
-    properties: Optional[list]
     amount: float
     spatial_context: GeonamesIRI = GeonamesIRI("https://sws.geonames.org/6295630/")
+    properties: Optional[list] = None
     begin_date: Optional[date] = None
     end_date: Optional[date] = None
 

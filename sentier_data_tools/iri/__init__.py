@@ -4,6 +4,7 @@ __all__ = (
     "ModelTermIRI",
     "FlowIRI",
     "GeonamesIRI",
+    "VocabIRI",
 )
 
 from sentier_data_tools.iri.main import (
@@ -12,4 +13,5 @@ from sentier_data_tools.iri.main import (
     ModelTermIRI,
     ProductIRI,
     UnitIRI,
+    VocabIRI,
 )

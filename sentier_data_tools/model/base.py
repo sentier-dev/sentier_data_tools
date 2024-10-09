@@ -3,9 +3,9 @@ from datetime import date
 
 import pandas as pd
 
-from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI
-from sentier_data_tools.local_storage.db import Dataframe
-from sentier_data_tools.local_storage.fields import DataframeKind
+from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI, VocabIRI
+from sentier_data_tools.local_storage.db import Dataset
+from sentier_data_tools.local_storage.fields import DatasetKind
 from sentier_data_tools.model.arguments import Demand, Flow, RunConfig
 
 
@@ -13,20 +13,38 @@ class SentierModel(ABC):
     def __init__(self, demand: Demand, run_config: RunConfig):
         self.demand = demand
         self.run_config = run_config
-        if self.run_config.begin_date is None:
-            self.run_config.begin_date = date(date.today().year - 5, 1, 1)
-        if self.run_config.end_date is None:
-            self.run_config.end_date = date(date.today().year + 4, 1, 1)
+        if self.demand.begin_date is None:
+            self.demand.begin_date = date(date.today().year - 5, 1, 1)
+        if self.demand.end_date is None:
+            self.demand.end_date = date(date.today().year + 4, 1, 1)
+        self.validate_needs_provides()
 
-    def get_model_data(self, abbreviate_iris: bool = True) -> list[pd.DataFrame]:
-        pass
+    def validate_needs_provides(self):
+        for elem in self.needs:
+            if not isinstance(elem, VocabIRI):
+                raise ValueError(
+                    f"Every term in `needs` must be an instance of `VocabIRI`; got {type(elem)}"
+                )
+        for elem in self.provides:
+            if not isinstance(elem, VocabIRI):
+                raise ValueError(
+                    f"Every term in `provides` must be an instance of `VocabIRI`; got {type(elem)}"
+                )
+        if isinstance(self.needs, dict) and len(set(self.needs.values())) != len(
+            self.needs
+        ):
+            raise ValueError("Duplicates alias labels in `needs`")
+        if isinstance(self.provides, dict) and len(set(self.provides.values())) != len(
+            self.provides
+        ):
+            raise ValueError("Duplicates alias labels in `provides`")
 
-    def prepare(self, abbreviate_iris: bool = True) -> None:
-        self.get_model_data(abbreviate_iris=abbreviate_iris)
-        self.data_validity_checks()
-        self.resample()
+    # def prepare(self) -> None:
+    #     self.get_model_data()
+    #     self.data_validity_checks()
+    #     self.resample()
 
-    @abstractmethod
+    # @abstractmethod
     def data_validity_checks(self) -> None:
         pass
 
@@ -37,6 +55,22 @@ class SentierModel(ABC):
     @property
     def _provides_str(self):
         return {str(elem) for elem in self.provides}
+
+    @property
+    def _provides_narrower(self):
+        return {
+            str(other)
+            for elem in self.provides
+            for other in elem.narrower(raw_strings=True)
+        }
+
+    @property
+    def _provides_broader(self):
+        return {
+            str(other)
+            for elem in self.provides
+            for other in elem.broader(raw_strings=True)
+        }
 
     @property
     def _needs_str(self):
@@ -58,34 +92,24 @@ class SentierModel(ABC):
             for other in elem.broader(raw_strings=True)
         }
 
-    def get_model_data(self) -> dict:
+    def get_model_data(self, product: VocabIRI, kind: DatasetKind) -> dict:
         return {
-            DataframeKind.BOM: {
-                "exactMatch": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.BOM,
-                    Dataframe.product << self._needs_str,
-                ),
-                "broader": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.BOM,
-                    Dataframe.product << self._needs_broader,
-                ),
-                "narrower": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.BOM,
-                    Dataframe.product << self._needs_narrower,
-                ),
-            },
-            DataframeKind.PARAMETERS: {
-                "exactMatch": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.PARAMETERS,
-                    Dataframe.product << self._needs_str,
-                ),
-                "broader": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.PARAMETERS,
-                    Dataframe.product << self._needs_broader,
-                ),
-                "narrower": Dataframe.select().where(
-                    Dataframe.kind == DataframeKind.PARAMETERS,
-                    Dataframe.product << self._needs_narrower,
-                ),
-            },
+            "exactMatch": list(
+                Dataset.select().where(
+                    Dataset.kind == kind,
+                    Dataset.product == str(product),
+                )
+            ),
+            "broader": list(
+                Dataset.select().where(
+                    Dataset.kind == kind,
+                    Dataset.product << product.broader(raw_strings=True),
+                )
+            ),
+            "narrower": list(
+                Dataset.select().where(
+                    Dataset.kind == kind,
+                    Dataset.product << product.narrower(raw_strings=True),
+                )
+            ),
         }

@@ -1,18 +1,18 @@
 __all__ = (
     "DefaultDataSource",
-    "Dataframe",
-    "DataframeKind",
+    "Dataset",
+    "DatasetKind",
     "reset_local_database",
 )
 
 
 from sentier_data_tools.local_storage.datasource import DefaultDataSource
 from sentier_data_tools.local_storage.db import (
-    Dataframe,
+    Dataset,
     initialize_local_database,
     reset_local_database,
     sqlite_db,
 )
-from sentier_data_tools.local_storage.fields import DataframeKind
+from sentier_data_tools.local_storage.fields import DatasetKind
 
 initialize_local_database(sqlite_db)

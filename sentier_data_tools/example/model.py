@@ -10,24 +10,31 @@ from sentier_data_tools import (
 from sentier_data_tools.logs import stdout_feedback_logger
 
 
-class ElectrolyzerModel(SentierModel):
-    provides = [ProductIRI("http://data.europa.eu/xsp/cn2024/280410000080")]
-    needs = [
+class WaterElectrolysisModel(SentierModel):
+    provides = {
+        ProductIRI(
+            "http://openenergy-platform.org/ontology/oeo/OEO_00010379"
+        ): "Hydrogen",
+    }
+    needs = {
         ModelTermIRI(
             "https://vocab.sentier.dev/model-terms/electrolyser/capacity_factor"
-        ),
+        ): "capacity_factor",
         ModelTermIRI(
             "https://vocab.sentier.dev/model-terms/electrolyser/product_lifetime"
-        ),
-    ]
+        ): "lifetime",
+        ModelTermIRI(
+            "https://vocab.sentier.dev/model-terms/energy/elec_energy_serv_dem"
+        ): "elec_energy_serv_dem",
+    }
 
     def run(self) -> tuple[list[Demand], list[Flow]]:
         self.prepare()
 
-    def prepare(self) -> None:
-        self.get_model_data()
-        self.data_validity_checks()
-        self.resample()
+    # def prepare(self) -> None:
+    #     self.get_model_data()
+    #     self.data_validity_checks()
+    #     self.resample()
 
     # Calculate bill of materials for main product
     # Pull in BOM data for hydrogen
