@@ -1,14 +1,14 @@
+import itertools
 from abc import ABC, abstractmethod
 from datetime import date
-import itertools
 
 import pandas as pd
 
 from sentier_data_tools.iri import FlowIRI, GeonamesIRI, ProductIRI, VocabIRI
 from sentier_data_tools.local_storage.db import Dataset
 from sentier_data_tools.local_storage.fields import DatasetKind
-from sentier_data_tools.model.arguments import Demand, Flow, RunConfig
 from sentier_data_tools.logs import stdout_feedback_logger as logger
+from sentier_data_tools.model.arguments import Demand, Flow, RunConfig
 
 
 class SentierModel(ABC):
@@ -48,7 +48,9 @@ class SentierModel(ABC):
                 continue
             elif hasattr(self, value):
                 if hasattr(self, f"var_{value}"):
-                    raise ValueError(f"Alias `{value}` conflicts with existing attribute")
+                    raise ValueError(
+                        f"Alias `{value}` conflicts with existing attribute"
+                    )
                 logger.info(f"Changing alias `{value}` to `var_{value}`")
                 setattr(self, f"var_{value}", key)
             else:
@@ -107,7 +109,9 @@ class SentierModel(ABC):
             for other in elem.broader(raw_strings=True)
         }
 
-    def get_model_data(self, product: VocabIRI, kind: DatasetKind) -> dict:
+    def get_model_data(
+        self, product: VocabIRI, kind: DatasetKind, relabel_columns: bool = True
+    ) -> dict:
         return {
             "exactMatch": list(
                 Dataset.select().where(
@@ -128,3 +132,14 @@ class SentierModel(ABC):
                 )
             ),
         }
+
+    def merge_datasets_to_dataframes(self, lst: list[Dataset]) -> pd.DataFrame:
+        if not lst:
+            return pd.DataFrame()
+        elif len(lst) == 1:
+            return lst[0].dataframe
+        else:
+            given = lst.pop(0)
+            while lst:
+                given = pd.merge(given, lst.pop(0), how="outer")
+            return given
