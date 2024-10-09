@@ -1,12 +1,15 @@
 import locale
 import platform
 from collections import defaultdict, deque
+from enum import Enum
 from functools import lru_cache
 import os
 from typing import Union
 
 from rdflib import Literal, URIRef
 from SPARQLWrapper import JSON, SPARQLWrapper
+
+from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 if language := os.environ.get("SDT_LOCALE"):
     pass
@@ -31,13 +34,18 @@ def execute_sparql_query(query: str) -> list:
     return sparql.queryAndConvert()["results"]["bindings"]
 
 
-def convert_json_object(obj: dict) -> Union[URIRef, Literal]:
+def convert_json_object(obj: dict) -> URIRef | Literal:
+    if "value" not in obj:
+        error_msg = f"Missing 'value' key in object: {obj}"
+        logger.error(error_msg)
+        raise ValueError(error_msg)
+
     if obj["type"] == "literal":
         return Literal(
             obj["value"], lang=obj.get("xml:lang"), datatype=obj.get("datatype")
         )
     else:
-        return URIRef(obj["value"])
+        return URIRef(str(obj["value"]))
 
 
 @lru_cache(maxsize=2048)
@@ -99,3 +107,11 @@ def resolve_hierarchy(
                     queue.append(code)
 
     return ordered
+
+
+class TriplePosition(Enum):
+    """Represents the position of an object in a triple store."""
+
+    SUBJECT = "s"
+    PREDICATE = "p"
+    OBJECT = "o"
