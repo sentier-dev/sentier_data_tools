@@ -48,6 +48,8 @@ class VocabIRI(URIRef):
 
         # pylint: disable=no-member
         QUERY = f"""
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            
             SELECT ?s ?p ?o
             FROM <{self.graph_url}>
             WHERE {{
