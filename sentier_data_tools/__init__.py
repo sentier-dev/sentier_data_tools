@@ -16,6 +16,7 @@ __all__ = (
     "RunConfig",
     "SentierModel",
     "UnitIRI",
+    "get_conversion_factor",
 )
 
 __version__ = "0.3"
@@ -35,3 +36,4 @@ from sentier_data_tools.local_storage import (
     reset_local_database,
 )
 from sentier_data_tools.model import Demand, Flow, RunConfig, SentierModel
+from sentier_data_tools.unit_conversion import get_conversion_factor

@@ -4,6 +4,7 @@ from sentier_data_tools import (
     FlowIRI,
     GeonamesIRI,
     ModelTermIRI,
+    DatasetKind,
     ProductIRI,
     SentierModel,
 )
@@ -29,8 +30,7 @@ class WaterElectrolysisModel(SentierModel):
     }
 
     def get_electrolysis_inventory(self) -> None:
-        ...
-        # bom_electrolysis = self.get_model_data(self, product: VocabIRI, kind: DatasetKind) -> dict:
+        bom_electrolysis = self.get_model_data(self, product=self.hydrogen, kind=DatasetKind.BOM)
 
     def run(self) -> tuple[list[Demand], list[Flow]]:
         self.prepare()
