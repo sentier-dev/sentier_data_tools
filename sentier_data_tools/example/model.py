@@ -12,12 +12,8 @@ from sentier_data_tools.logs import stdout_feedback_logger as logger
 
 
 class WaterElectrolysisModel(SentierModel):
-    provides = {
-        ProductIRI(
-            "http://openenergy-platform.org/ontology/oeo/OEO_00010379"
-        ): "hydrogen",
-    }
-    needs = {
+    provides = [ProductIRI("http://openenergy-platform.org/ontology/oeo/OEO_00010379")]
+    aliases = {
         ModelTermIRI(
             "https://vocab.sentier.dev/model-terms/electrolyser/capacity_factor"
         ): "capacity_factor",
@@ -28,6 +24,9 @@ class WaterElectrolysisModel(SentierModel):
             "https://vocab.sentier.dev/model-terms/energy/elec_energy_serv_dem"
         ): "elec_energy_serv_dem",
         ProductIRI("https://vocab.sentier.dev/products/electrolyzer"): "electrolyzer",
+        ProductIRI(
+            "http://openenergy-platform.org/ontology/oeo/OEO_00010379"
+        ): "hydrogen",
     }
 
     def get_electrolysis_inventory(self) -> None:
