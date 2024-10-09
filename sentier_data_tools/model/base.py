@@ -69,46 +69,6 @@ class SentierModel(ABC):
     def run(self) -> tuple[list[Demand], list[Flow]]:
         pass
 
-    @property
-    def _provides_str(self):
-        return {str(elem) for elem in self.provides}
-
-    @property
-    def _provides_narrower(self):
-        return {
-            str(other)
-            for elem in self.provides
-            for other in elem.narrower(raw_strings=True)
-        }
-
-    @property
-    def _provides_broader(self):
-        return {
-            str(other)
-            for elem in self.provides
-            for other in elem.broader(raw_strings=True)
-        }
-
-    @property
-    def _needs_str(self):
-        return {str(elem) for elem in self.needs}
-
-    @property
-    def _needs_narrower(self):
-        return {
-            str(other)
-            for elem in self.needs
-            for other in elem.narrower(raw_strings=True)
-        }
-
-    @property
-    def _needs_broader(self):
-        return {
-            str(other)
-            for elem in self.needs
-            for other in elem.broader(raw_strings=True)
-        }
-
     def get_model_data(
         self, product: VocabIRI, kind: DatasetKind, relabel_columns: bool = True
     ) -> dict:

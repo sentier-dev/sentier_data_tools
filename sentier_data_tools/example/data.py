@@ -42,7 +42,7 @@ def create_example_local_datastorage(reset: bool = True):
 
         sdt.Dataset(
             name=f"electrolyser model data for {kind.lower()}",
-            data=filtered,
+            dataframe=filtered,
             product=iri,
             columns=[{"iri": x, "unit": y} for x, y in zip(COLUMNS, UNITS)],
             metadata=metadata,
@@ -55,7 +55,7 @@ def create_example_local_datastorage(reset: bool = True):
     for key, value in LIFETIMES.items():
         sdt.Dataset(
             name="Estimated electrolyzer BoP (balance of plant) lifetimes",
-            data=pd.DataFrame([{key: value}]),
+            dataframe=pd.DataFrame([{key: value}]),
             product=key,
             columns=[
                 {
@@ -72,7 +72,7 @@ def create_example_local_datastorage(reset: bool = True):
 
     sdt.Dataset(
         name="Estimated PEM electrolyzer Stack materials",
-        data=pd.DataFrame(PEM_STACK),
+        dataframe=pd.DataFrame(PEM_STACK),
         product="https://vocab.sentier.dev/products/pem-electrolyzer",
         columns=PEM_STACK_COLUMNS,
         location="https://sws.geonames.org/6255148/",
@@ -88,7 +88,7 @@ def create_example_local_datastorage(reset: bool = True):
 
     sdt.Dataset(
         name="electrolysis water consumption value",
-        data=pd.DataFrame(
+        dataframe=pd.DataFrame(
             [
                 {
                     "http://data.europa.eu/xsp/cn2024/285390100080": 14.0,

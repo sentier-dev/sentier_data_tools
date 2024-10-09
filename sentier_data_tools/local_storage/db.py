@@ -8,7 +8,7 @@ from playhouse.sqlite_ext import JSONField, SqliteExtDatabase
 from sentier_data_tools.local_storage.fields import (
     ColumnsField,
     DatasetKind,
-    FeatherField,
+    PandasFeatherField,
     GeonamesIRIField,
     ProductIRIField,
 )
@@ -17,7 +17,7 @@ base_dir = Path(platformdirs.user_data_dir(appname="sentier.dev", appauthor="DdS
 sqlite_dir_platformdirs = base_dir / "local-data-store"
 sqlite_dir_platformdirs.mkdir(exist_ok=True, parents=True)
 
-DB_NAME = "dataset.db"
+DB_NAME = "datasets.db"
 sqlite_db = SqliteExtDatabase(sqlite_dir_platformdirs / DB_NAME)
 
 
@@ -39,7 +39,7 @@ def reset_local_database() -> None:
 
 class Dataset(Model):
     name = TextField()
-    data = FeatherField()
+    dataframe = PandasFeatherField()
     kind = EnumField(DatasetKind, default=DatasetKind.PARAMETERS)
     product = ProductIRIField(null=True)
     location = GeonamesIRIField(default=global_location_default)
@@ -53,7 +53,3 @@ class Dataset(Model):
 
     class Meta:
         database = sqlite_db
-
-    @property
-    def dataframe(self):
-        return self.data.to_pandas()

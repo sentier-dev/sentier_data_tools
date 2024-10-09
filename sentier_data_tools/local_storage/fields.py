@@ -12,7 +12,7 @@ from rdflib import URIRef
 from sentier_data_tools.iri import GeonamesIRI, ProductIRI
 
 
-class FeatherField(BlobField):
+class PandasFeatherField(BlobField):
     def db_value(self, value: Union[pd.DataFrame, pa.Table]) -> BytesIO:
         if isinstance(value, pd.DataFrame):
             schema = pa.Schema.from_pandas(value, preserve_index=False)
@@ -30,7 +30,7 @@ class FeatherField(BlobField):
     def python_value(self, value):
         buffer = pa.py_buffer(value)
         reader = pa.ipc.open_stream(buffer)
-        return reader.read_all()
+        return reader.read_all().to_pandas()
 
 
 class IRIField(TextField):

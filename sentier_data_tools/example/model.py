@@ -27,6 +27,7 @@ class WaterElectrolysisModel(SentierModel):
         ModelTermIRI(
             "https://vocab.sentier.dev/model-terms/energy/elec_energy_serv_dem"
         ): "elec_energy_serv_dem",
+        ProductIRI("https://vocab.sentier.dev/products/electrolyzer"): "electrolyzer",
     }
 
     def get_electrolysis_inventory(self) -> None:

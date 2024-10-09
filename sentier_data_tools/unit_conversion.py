@@ -56,9 +56,9 @@ def get_conversion_factor(from_iri: UnitIRI, to_iri: UnitIRI) -> float:
     qk1 = get_quantity_kinds_for_unit(from_iri)
     qk2 = get_quantity_kinds_for_unit(to_iri)
     common = qk1.intersection(qk2)
-    logger.info("Found common quantity keys for %s to %s: %s", from_iri, to_iri, common)
     if not common:
         raise ValueError("Given units have no common quantity kinds")
+    logger.debug("Found common quantity keys for %s to %s: %s", from_iri, to_iri, common)
     conversion_dict = {}
     for qk in common:
         conversion_dict.update(get_units_for_quantity_kind(qk))
