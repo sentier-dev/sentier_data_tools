@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
@@ -14,8 +14,8 @@ class Edge(BaseModel):
     amount: float
     spatial_context: GeonamesIRI = GeonamesIRI("https://sws.geonames.org/6295630/")
     properties: Optional[list] = None
-    begin_date: Optional[date] = None
-    end_date: Optional[date] = None
+    begin_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
