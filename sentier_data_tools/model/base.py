@@ -1,7 +1,7 @@
 import itertools
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from datetime import date
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
@@ -19,9 +19,9 @@ class SentierModel(ABC):
         self.timeline = defaultdict(list)
         self.run_config = run_config
         if self.demand.begin_date is None:
-            self.demand.begin_date = date(date.today().year - 5, 1, 1)
+            self.demand.begin_date = datetime(datetime.today().year - 5, 1, 1)
         if self.demand.end_date is None:
-            self.demand.end_date = date(date.today().year + 4, 1, 1)
+            self.demand.end_date = datetime(datetime.today().year + 4, 1, 1)
         self.validate_aliases()
         self.inject_aliases()
 
@@ -56,8 +56,8 @@ class SentierModel(ABC):
         #     #         amount: float
         #     #         spatial_context: GeonamesIRI = GeonamesIRI("https://sws.geonames.org/6295630/")
         #     #         properties: Optional[list] = None
-        #     #         begin_date: Optional[date] = None
-        #     #         end_date: Optional[date] = None
+        #     #         begin_date: Optional[datetime] = None
+        #     #         end_date: Optional[datetime] = None
         #     #     )
         #     # )
         ...
