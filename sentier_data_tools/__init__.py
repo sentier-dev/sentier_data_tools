@@ -19,7 +19,7 @@ __all__ = (
     "get_conversion_factor",
 )
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 import sentier_data_tools.patch_pandas
 from sentier_data_tools.datapackage import Datapackage
